@@ -24,6 +24,8 @@
 #include "driver/ledc.h"
 #include "esp32-hal-ledc.h"
 #include <stdint.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 const char* PARAM_FADER1 = "fader1";
 const char* PARAM_FADER2 = "fader2";
@@ -42,7 +44,7 @@ String sta_ssid = "$your_ssid_maximum_32_characters";     // set Wifi network yo
 String sta_password = "$your_pswd_maximum_32_characters";        // set password for Wifi network
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
-#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define SCREEN_HEIGHT 32 // OLED display height, in pixels
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3c ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -97,6 +99,22 @@ void setup() {
   
   //Wire.begin();
   Wire.begin(21,22); // SDA, SCL
+
+  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
+      Serial.println(F("SSD1306 allocation failed"));
+      for (;;); // Don't proceed, loop forever
+  }
+
+  display.setRotation(2); // rotate 180°
+  display.clearDisplay();
+  display.setCursor(0,0);
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.print("LEMMING2 HW-Test");
+  display.display();
+
+
   initMPU6050();
 
   // Set NodeMCU Wifi hostname based on chip mac address
