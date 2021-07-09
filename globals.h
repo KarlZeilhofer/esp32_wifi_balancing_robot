@@ -10,6 +10,7 @@
 
 #include <Arduino.h>
 #include "esp32-hal-timer.h"
+#include <stdint.h>
 
 extern volatile long counter1;
 extern volatile long counter2;

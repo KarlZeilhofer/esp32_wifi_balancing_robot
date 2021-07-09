@@ -23,6 +23,7 @@
 #include "driver/timer.h"
 #include "driver/ledc.h"
 #include "esp32-hal-ledc.h"
+#include <stdint.h>
 
 const char* PARAM_FADER1 = "fader1";
 const char* PARAM_FADER2 = "fader2";
@@ -39,6 +40,13 @@ const char* PARAM_FADER6 = "fader6";
 /* Wifi Crdentials */
 String sta_ssid = "$your_ssid_maximum_32_characters";     // set Wifi network you want to connect to
 String sta_password = "$your_pswd_maximum_32_characters";        // set password for Wifi network
+
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS 0x3c ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 
 unsigned long previousMillis = 0;
 
@@ -87,7 +95,8 @@ void setup() {
   delay(50);
   ledcWrite(6, SERVO_AUX_NEUTRO);
   
-  Wire.begin();
+  //Wire.begin();
+  Wire.begin(21,22); // SDA, SCL
   initMPU6050();
 
   // Set NodeMCU Wifi hostname based on chip mac address

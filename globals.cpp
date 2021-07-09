@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include "defines.h"
 #include "esp32-hal-timer.h"
+#include <stdint.h>
 
 String MAC;  // MAC address of Wifi module
 
