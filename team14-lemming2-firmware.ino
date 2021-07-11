@@ -68,8 +68,8 @@ void notFound(AsyncWebServerRequest *request) {
 
 void setup() {
 
-    speed_M1 = 0;
-    speed_M2 = 0;
+    act_speed_M1 = 0;
+    act_speed_M2 = 0;
 
     Serial.begin(115200);         // set up seriamonitor at 115200 bps
     Serial.setDebugOutput(true);
@@ -92,9 +92,9 @@ void setup() {
     pinMode(PIN_MICROSTEP1, OUTPUT);
     digitalWrite(PIN_MICROSTEP1, HIGH);
     pinMode(PIN_MICROSTEP2, OUTPUT);
-    digitalWrite(PIN_MICROSTEP1, LOW);
+    digitalWrite(PIN_MICROSTEP1, HIGH);
     pinMode(PIN_MICROSTEP3, OUTPUT);
-    digitalWrite(PIN_MICROSTEP1, LOW);
+    digitalWrite(PIN_MICROSTEP1, HIGH);
 
     pinMode(PIN_MOTOR1_DIR, OUTPUT);
     pinMode(PIN_MOTOR1_STEP, OUTPUT);
@@ -321,26 +321,20 @@ void setup() {
     setMotorSpeedM1(0);
 }
 
-void test(){
-    if((millis()/1000)%2 == 0){
-        setMotorSpeedM1(0);
-        setMotorSpeedM2(-400);
+void test1(){
+    if((millis()/2000)%2 == 0){
+        setMotorSpeedM1(100*16);
+        //setMotorSpeedM2(-400);
     }else{
-        setMotorSpeedM1(0);
-        setMotorSpeedM2(400);
+        setMotorSpeedM1(400*16);
+        //setMotorSpeedM2(400);
     }
-    delay(1);
+    delay(10);
 }
 
 void test2(){
-    if((millis()/1000)%2 == 0){
-        setMotorSpeedM1(0);
-        setMotorSpeedM2(-400);
-    }else{
-        setMotorSpeedM1(0);
-        setMotorSpeedM2(400);
-    }
-    delay(1);
+    setMotorSpeedM1(400*16);
+    delay(10);
 }
 
 
@@ -372,7 +366,7 @@ void showText3(String str){
 void loop() {
     //ArduinoOTA.handle();
 
-    test2();
+    test1();
     return;
 
 //    if (OSCnewMessage) {
@@ -400,7 +394,7 @@ void loop() {
 
         // We calculate the estimated robot speed:
         // Estimated_Speed = angular_velocity_of_stepper_motors(combined) - angular_velocity_of_robot(angle measured by IMU)
-        actual_robot_speed = (speed_M1 + speed_M2) / 2; // Positive: forward
+        actual_robot_speed = (act_speed_M1 + act_speed_M2) / 2; // Positive: forward
 
         int16_t angular_velocity = (angle_adjusted - angle_adjusted_Old) * 25.0; // 25 is an empirical extracted factor to adjust for real units
         int16_t estimated_speed = -actual_robot_speed + angular_velocity;
@@ -409,8 +403,8 @@ void loop() {
 
         if (positionControlMode) {
             // POSITION CONTROL. INPUT: Target steps for each motor. Output: motors speed
-            motor1_control = positionPDControl(steps1, target_steps1, Kp_position, Kd_position, speed_M1);
-            motor2_control = positionPDControl(steps2, target_steps2, Kp_position, Kd_position, speed_M2);
+            motor1_control = positionPDControl(steps1, target_steps1, Kp_position, Kd_position, act_speed_M1);
+            motor2_control = positionPDControl(steps2, target_steps2, Kp_position, Kd_position, act_speed_M2);
 
             // Convert from motor position control to throttle / steering commands
             throttle = (motor1_control + motor2_control) / 2;

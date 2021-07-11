@@ -16,6 +16,7 @@
 #include "driver/periph_ctrl.h"
 #include "driver/timer.h"
 #include "esp32-hal-timer.h"
+#include <stdint.h>
 
 extern "C" {
 
@@ -23,33 +24,64 @@ portMUX_TYPE muxer1 = portMUX_INITIALIZER_UNLOCKED;
 portMUX_TYPE muxer2 = portMUX_INITIALIZER_UNLOCKED;
 
 void IRAM_ATTR timer1ISR() {
-    static bool set = false;
+    static bool stepSet = false;
+    static uint32_t timer_period = ZERO_SPEED_PERIOD;
     portENTER_CRITICAL_ISR(&muxer1);
 
-    if (dir_M1 != 0) {
-        // toggle step signal. state is increased in stepper controller each rising edge.
-        // pulse width has to be at least 1us.
-        if(set){
-            set = false;
-            digitalWrite(PIN_MOTOR1_STEP, LOW);
+    // change DIR pin only on falling edge of STEP pin, to comply with setup and hold timings
+    if(stepSet){
+        digitalWrite(PIN_MOTOR1_STEP, LOW);
+        stepSet = false;
+
+        if(act_speed_M1 > 0){
+            digitalWrite(PIN_MOTOR1_DIR, HIGH);
         }else{
-            set = true;
-            digitalWrite(PIN_MOTOR1_STEP, HIGH);
+            digitalWrite(PIN_MOTOR1_DIR, LOW);
+        }
+    }else{
+        // Update timer period
+        if(act_speed_M1 == 0 && target_speed_M1!=0){
+            // TODO: setup DIR pin first!
+            timer_period = TIMER_CLOCK/MIN_STEP_CLOCK;
+            if(target_speed_M1 > 0){
+                act_speed_M1 = MIN_STEP_CLOCK;
+            }else{
+                act_speed_M1 = -MIN_STEP_CLOCK;
+            }
+        // TODO: handle speed direction change!
+        }else if(target_speed_M1 > act_speed_M1){ // accellerating
+            act_speed_M1 = act_speed_M1 + ((MAX_ACCEL+act_speed_M1/2)/act_speed_M1); // constant accelleration, division with rounding
+            timer_period = (TIMER_CLOCK+act_speed_M1/2)/act_speed_M1;
+        }else if(target_speed_M1 < act_speed_M1){ // accellerating
+            act_speed_M1 = act_speed_M1 - ((MAX_ACCEL+act_speed_M1/2)/act_speed_M1); // constant accelleration, division with rounding
+            timer_period = (TIMER_CLOCK+act_speed_M1/2)/act_speed_M1;
         }
 
-        if (dir_M1 > 0)
+
+        digitalWrite(PIN_MOTOR1_STEP, HIGH); // step on rising edge
+        stepSet = true;
+    }
+
+
+
+    if (act_dir_M1 != 0) {
+        // toggle step signal. state is increased in stepper controller each rising edge.
+        // pulse width has to be at least 1us.
+
+        if (act_dir_M1 > 0)
             steps1--;
         else
             steps1++;
     }
-
     portEXIT_CRITICAL_ISR(&muxer1);
+
+    timerAlarmWrite(timer1, timer_period, true);
 }
 void IRAM_ATTR timer2ISR() {
     static bool set = false;
     portENTER_CRITICAL_ISR(&muxer2);
 
-    if (dir_M2 != 0) {
+    if (act_dir_M2 != 0) {
         // toggle step signal. state is increased in stepper controller each rising edge.
         // pulse width has to be at least 1us.
         if(set){
@@ -60,7 +92,7 @@ void IRAM_ATTR timer2ISR() {
             digitalWrite(PIN_MOTOR2_STEP, HIGH);
         }
 
-        if (dir_M2 > 0)
+        if (act_dir_M2 > 0)
             steps2--;
         else
             steps2++;
@@ -71,13 +103,13 @@ void IRAM_ATTR timer2ISR() {
 
 void initTimers() {
 
-    timer1 = timerBegin(0, 40, true);
+    timer1 = timerBegin(0, CPU_CLOCK/TIMER_CLOCK, true);
     timerAttachInterrupt(timer1, &timer1ISR, true);
-    timerAlarmWrite(timer1, ZERO_SPEED, true);
+    timerAlarmWrite(timer1, ZERO_SPEED_PERIOD, true);
 
-    timer2 = timerBegin(1, 40, true);
+    timer2 = timerBegin(1, CPU_CLOCK/TIMER_CLOCK, true);
     timerAttachInterrupt(timer2, &timer2ISR, true);
-    timerAlarmWrite(timer2, ZERO_SPEED, true);
+    timerAlarmWrite(timer2, ZERO_SPEED_PERIOD, true);
 
     timerAlarmEnable(timer1);
     timerAlarmEnable(timer2);

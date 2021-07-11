@@ -9,9 +9,10 @@
 #define MOTORS_H_
 
 #include <Arduino.h>
+#include <stdint.h>
 
-void setMotorSpeedM1(int16_t tspeed);
-void setMotorSpeedM2(int16_t tspeed);
+void setMotorSpeedM1(int32_t tspeed);
+void setMotorSpeedM2(int32_t tspeed);
 
 
 #endif /* MOTORS_H_ */

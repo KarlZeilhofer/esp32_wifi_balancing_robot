@@ -64,10 +64,13 @@
 #define SERVO2_NEUTRO 4444
 #define SERVO2_RANGE 8400
 
-#define ZERO_SPEED 0xffffff
-#define MAX_ACCEL 14      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
+#define MAX_ACCEL 32000L      // Maximun motor acceleration in 16th microsteps/s²
+#define TIMER_CLOCK 2000000L // frequency of stepping timer in Hz
+#define CPU_CLOCK 80000000L // frequency of CPU in Hz
+#define MIN_STEP_CLOCK (MAX_ACCEL/100)  // minimum 16th-step frequency in Hz
+#define ZERO_SPEED_PERIOD (TIMER_CLOCK/MIN_STEP_CLOCK) // in timer ticks
 
-#define MICROSTEPPING 2   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
+#define MICROSTEPPING 16   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
 
 // AUX definitions
 #define CLR(x,y) (x&=(~(1<<y)))

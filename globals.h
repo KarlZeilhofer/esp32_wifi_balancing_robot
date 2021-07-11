@@ -77,8 +77,9 @@ extern int32_t target_steps2;
 extern int16_t motor1_control;
 extern int16_t motor2_control;
 
-extern int16_t speed_M1, speed_M2;        // Actual speed of motors
-extern int8_t  dir_M1, dir_M2;            // Actual direction of steppers motors
+extern int32_t act_speed_M1, act_speed_M2;        // Actual speed of motors in 16th microsteps per second.
+extern int32_t target_speed_M1, target_speed_M2;        // Actual speed of motors in 16th microsteps per second.
+extern int8_t  act_dir_M1, act_dir_M2;            // Actual direction of steppers motors (-1/0/+1)
 extern int16_t actual_robot_speed;        // overall robot speed (measured from steppers speed)
 extern int16_t actual_robot_speed_Old;
 extern float estimated_speed_filtered;    // Estimated robot speed
