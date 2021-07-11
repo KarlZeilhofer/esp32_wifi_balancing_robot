@@ -60,7 +60,7 @@ void setMotorSpeedM1(int16_t tspeed)
 // tspeed could be positive or negative (reverse)
 void setMotorSpeedM2(int16_t tspeed)
 {
-  long timer_period;
+  int32_t timer_period;
   int16_t speed;
 
   // Limit max speed?

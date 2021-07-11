@@ -4,7 +4,7 @@
  *  Created on: 23.02.2021
  *      Author: anonymous
  */
- 
+
 #include <Wire.h>
 #include <WiFi.h>
 #include <ArduinoOTA.h>
@@ -67,6 +67,10 @@ void notFound(AsyncWebServerRequest *request) {
 }
 
 void setup() {
+
+    speed_M1 = 0;
+    speed_M2 = 0;
+
   Serial.begin(115200);         // set up seriamonitor at 115200 bps
   Serial.setDebugOutput(true);
   Serial.println();
@@ -76,27 +80,40 @@ void setup() {
 
   pinMode(PIN_ENABLE_MOTORS, OUTPUT);
   digitalWrite(PIN_ENABLE_MOTORS, HIGH);
-  
+  pinMode(PIN_nRESET_MOTORS, OUTPUT);
+  digitalWrite(PIN_nRESET_MOTORS, HIGH);
+  pinMode(PIN_nSLEEP_MOTORS, OUTPUT);
+  digitalWrite(PIN_nSLEEP_MOTORS, HIGH);
+
+  // HHL: 1/8 step
+  // HHH: 1/16 step
+  pinMode(PIN_MICROSTEP1, OUTPUT);
+  digitalWrite(PIN_MICROSTEP1, HIGH);
+  pinMode(PIN_MICROSTEP2, OUTPUT);
+  digitalWrite(PIN_MICROSTEP1, HIGH);
+  pinMode(PIN_MICROSTEP3, OUTPUT);
+  digitalWrite(PIN_MICROSTEP1, LOW);
+
   pinMode(PIN_MOTOR1_DIR, OUTPUT);
   pinMode(PIN_MOTOR1_STEP, OUTPUT);
   pinMode(PIN_MOTOR2_DIR, OUTPUT);
   pinMode(PIN_MOTOR2_STEP, OUTPUT);
-  pinMode(PIN_SERVO, OUTPUT);
+//  pinMode(PIN_SERVO, OUTPUT);
 
-  pinMode(PIN_LED, OUTPUT);
-  digitalWrite(PIN_LED, LOW);
+//  pinMode(PIN_LED, OUTPUT);
+//  digitalWrite(PIN_LED, LOW);
 
-  pinMode(PIN_WIFI_LED, OUTPUT);
-  digitalWrite(PIN_WIFI_LED, LOW);
-  
-  pinMode(PIN_BUZZER, OUTPUT);
-  digitalWrite(PIN_BUZZER, LOW);
+//  pinMode(PIN_WIFI_LED, OUTPUT);
+//  digitalWrite(PIN_WIFI_LED, LOW);
+
+//  pinMode(PIN_BUZZER, OUTPUT);
+//  digitalWrite(PIN_BUZZER, LOW);
 
   ledcSetup(6, 50, 16); // channel 6, 50 Hz, 16-bit width
   ledcAttachPin(PIN_SERVO, 6);   // GPIO 22 assigned to channel 1
   delay(50);
   ledcWrite(6, SERVO_AUX_NEUTRO);
-  
+
   //Wire.begin();
   Wire.begin(21,22); // SDA, SCL
 
@@ -111,7 +128,7 @@ void setup() {
   display.setCursor(0,0);
   display.setTextSize(1);
   display.setTextColor(WHITE);
-  display.print("LEMMING2 HW-Test");
+  display.print("LEMMING 2");
   display.display();
 
 
@@ -135,6 +152,8 @@ void setup() {
   Serial.println(sta_password);
 
   // try to connect with Wifi network about 8 seconds
+
+  /*
   unsigned long currentMillis = millis();
   previousMillis = currentMillis;
   while (WiFi.status() != WL_CONNECTED && currentMillis - previousMillis <= 8000) {
@@ -142,7 +161,9 @@ void setup() {
     Serial.print(".");
     currentMillis = millis();
   }
+  */
 
+  /*
   // if failed to connect with Wifi network set NodeMCU as AP mode
   IPAddress myIP;
   if (WiFi.status() == WL_CONNECTED) {
@@ -271,7 +292,7 @@ void setup() {
 
   server.onNotFound (notFound);    // when a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
   server.begin();                           // actually start the server
-
+*/
   initTimers();
 
   // default neutral values
@@ -280,6 +301,7 @@ void setup() {
   OSCfader[2] = 0.5;
   OSCfader[3] = 0.5;
 
+  Serial.println("Enable Motors");
   digitalWrite(PIN_ENABLE_MOTORS, LOW);
   for (uint8_t k = 0; k < 5; k++) {
     setMotorSpeedM1(5);
@@ -293,11 +315,33 @@ void setup() {
   }
   ledcWrite(6, SERVO_AUX_NEUTRO);
 
-  ArduinoOTA.begin();   // enable to receive update/upload firmware via Wifi OTA
+  //ArduinoOTA.begin();   // enable to receive update/upload firmware via Wifi OTA
+}
+
+void test(){
+    setMotorSpeedM1(0);
+    setMotorSpeedM2(-100);
+    delay(1000);
+    setMotorSpeedM2(100);
+    delay(1000);
+    showVoltage();
+}
+
+void showVoltage(){
+    uint32_t v = 0;//adc.readVoltage();
+    display.setRotation(2); // rotate 180°
+    display.fillRect(0, 10, 128, 10, BLACK);
+    display.setCursor(0,10);
+    display.setTextColor(WHITE);
+    display.print(v);
+    display.display();
 }
 
 void loop() {
-  ArduinoOTA.handle();
+  //ArduinoOTA.handle();
+
+  test();
+  return;
 
   if (OSCnewMessage) {
     OSCnewMessage = 0;
@@ -307,9 +351,9 @@ void loop() {
   timer_value = micros();
 
   if (MPU6050_newData()) {
-    
+
     MPU6050_read_3axis();
-    
+
     dt = (timer_value - timer_old) * 0.000001; // dt in seconds
     //Serial.println(timer_value - timer_old);
     timer_old = timer_value;
@@ -392,7 +436,7 @@ void loop() {
       throttle = 0;
       steering = 0;
     }
-    
+
     // Push1 Move servo arm
     if (OSCpush[0]) {
       if (angle_adjusted > -40)

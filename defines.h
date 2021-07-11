@@ -8,12 +8,19 @@
 #ifndef DEFINES_H_
 #define DEFINES_H_
 
-#define PIN_ENABLE_MOTORS 12        
-#define PIN_MOTOR1_DIR 27    
-#define PIN_MOTOR1_STEP 14    
-#define PIN_MOTOR2_DIR 25    
-#define PIN_MOTOR2_STEP 26   
-#define PIN_SERVO 13    
+#define PIN_ENABLE_MOTORS 12
+#define PIN_nRESET_MOTORS 16
+#define PIN_nSLEEP_MOTORS 5
+// RIGHT:
+#define PIN_MOTOR1_DIR 27
+#define PIN_MOTOR1_STEP 14
+// LEFT:
+#define PIN_MOTOR2_DIR 25
+#define PIN_MOTOR2_STEP 26
+#define PIN_MICROSTEP1 17
+#define PIN_MICROSTEP2 18
+#define PIN_MICROSTEP3 19
+#define PIN_SERVO 13
 #define PIN_LED 32         
 #define PIN_WIFI_LED 2        
 #define PIN_BUZZER 33         
@@ -58,7 +65,7 @@
 #define SERVO2_RANGE 8400
 
 #define ZERO_SPEED 0xffffff
-#define MAX_ACCEL 14      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
+#define MAX_ACCEL 1      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
 
 #define MICROSTEPPING 8   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
 
