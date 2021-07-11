@@ -54,7 +54,7 @@
 #define ITERM_MAX_ERROR 30   // Iterm windup constants for PI control
 #define ITERM_MAX 10000
 
-#define ANGLE_OFFSET 0.0  // Offset angle for balance (to compensate robot own weight distribution)
+#define ANGLE_OFFSET 90.0  // Offset angle for balance (to compensate robot own weight distribution)
 
 // Servo definitions
 #define SERVO_AUX_NEUTRO 4444  // Servo neutral position
@@ -65,9 +65,9 @@
 #define SERVO2_RANGE 8400
 
 #define ZERO_SPEED 0xffffff
-#define MAX_ACCEL 1      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
+#define MAX_ACCEL 14      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
 
-#define MICROSTEPPING 8   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
+#define MICROSTEPPING 2   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
 
 // AUX definitions
 #define CLR(x,y) (x&=(~(1<<y)))

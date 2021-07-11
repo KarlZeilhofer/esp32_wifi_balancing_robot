@@ -85,12 +85,14 @@ void setup() {
     pinMode(PIN_nSLEEP_MOTORS, OUTPUT);
     digitalWrite(PIN_nSLEEP_MOTORS, HIGH);
 
+    // LLL: full-step
+    // HLL: half-step
     // HHL: 1/8 step
     // HHH: 1/16 step
     pinMode(PIN_MICROSTEP1, OUTPUT);
     digitalWrite(PIN_MICROSTEP1, HIGH);
     pinMode(PIN_MICROSTEP2, OUTPUT);
-    digitalWrite(PIN_MICROSTEP1, HIGH);
+    digitalWrite(PIN_MICROSTEP1, LOW);
     pinMode(PIN_MICROSTEP3, OUTPUT);
     digitalWrite(PIN_MICROSTEP1, LOW);
 
@@ -303,50 +305,80 @@ void setup() {
 
     Serial.println("Enable Motors");
     digitalWrite(PIN_ENABLE_MOTORS, LOW);
-    for (uint8_t k = 0; k < 5; k++) {
-        setMotorSpeedM1(5);
-        setMotorSpeedM2(5);
-        ledcWrite(6, SERVO_AUX_NEUTRO + 250);
-        delay(200);
-        setMotorSpeedM1(-5);
-        setMotorSpeedM2(-5);
-        ledcWrite(6, SERVO_AUX_NEUTRO - 250);
-        delay(200);
-    }
-    ledcWrite(6, SERVO_AUX_NEUTRO);
+//    for (uint8_t k = 0; k < 5; k++) {
+//        setMotorSpeedM1(5);
+//        setMotorSpeedM2(5);
+//        ledcWrite(6, SERVO_AUX_NEUTRO + 250);
+//        delay(200);
+//        setMotorSpeedM1(-5);
+//        setMotorSpeedM2(-5);
+//        ledcWrite(6, SERVO_AUX_NEUTRO - 250);
+//        delay(200);
+//    }
+//    ledcWrite(6, SERVO_AUX_NEUTRO);
 
     //ArduinoOTA.begin();   // enable to receive update/upload firmware via Wifi OTA
+    setMotorSpeedM1(0);
 }
 
 void test(){
-    setMotorSpeedM1(0);
-    setMotorSpeedM2(-100);
-    delay(1000);
-    setMotorSpeedM2(100);
-    delay(1000);
-    showVoltage();
+    if((millis()/1000)%2 == 0){
+        setMotorSpeedM1(0);
+        setMotorSpeedM2(-400);
+    }else{
+        setMotorSpeedM1(0);
+        setMotorSpeedM2(400);
+    }
+    delay(1);
 }
 
-void showVoltage(){
+void test2(){
+    if((millis()/1000)%2 == 0){
+        setMotorSpeedM1(0);
+        setMotorSpeedM2(-400);
+    }else{
+        setMotorSpeedM1(0);
+        setMotorSpeedM2(400);
+    }
+    delay(1);
+}
+
+
+void showText1(String str){
     uint32_t v = 0;//adc.readVoltage();
-    display.setRotation(2); // rotate 180°
-    display.fillRect(0, 10, 128, 10, BLACK);
-    display.setCursor(0,10);
+    display.fillRect(0, 0, 128, 10, BLACK);
+    display.setCursor(0, 0);
     display.setTextColor(WHITE);
-    display.print(v);
+    display.print(str);
+    display.display();
+}
+void showText2(String str){
+    uint32_t v = 0;//adc.readVoltage();
+    display.fillRect(0, 10, 128, 10, BLACK);
+    display.setCursor(0, 10);
+    display.setTextColor(WHITE);
+    display.print(str);
+    display.display();
+}
+void showText3(String str){
+    uint32_t v = 0;//adc.readVoltage();
+    display.fillRect(0, 20, 128, 10, BLACK);
+    display.setCursor(0, 20);
+    display.setTextColor(WHITE);
+    display.print(str);
     display.display();
 }
 
 void loop() {
     //ArduinoOTA.handle();
 
-    test();
+    test2();
     return;
 
-    if (OSCnewMessage) {
-        OSCnewMessage = 0;
-        processOSCMsg();
-    }
+//    if (OSCnewMessage) {
+//        OSCnewMessage = 0;
+//        processOSCMsg();
+//    }
 
     timer_value = micros();
 
