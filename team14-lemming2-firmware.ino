@@ -49,6 +49,10 @@ String sta_password = "$your_pswd_maximum_32_characters";        // set password
 #define SCREEN_ADDRESS 0x3c ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+String zeile1;
+String zeile2;
+String zeile3;
+
 
 unsigned long previousMillis = 0;
 
@@ -67,6 +71,21 @@ void notFound(AsyncWebServerRequest *request) {
 }
 
 void setup() {
+    pinMode(PIN_SELBSTHALTUNG, OUTPUT);
+    digitalWrite(PIN_SELBSTHALTUNG, HIGH);
+
+    //Wire.begin();
+    Wire.begin(21,22); // SDA, SCL
+
+    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;); // Don't proceed, loop forever
+    }
+
+    display.setRotation(2); // rotate 180°
+    showText1("TEAM14 LEMMING 2");
+    delay(1000);
 
     act_speed_M1 = 0;
     act_speed_M2 = 0;
@@ -74,9 +93,6 @@ void setup() {
     Serial.begin(115200);         // set up seriamonitor at 115200 bps
     Serial.setDebugOutput(true);
     Serial.println();
-    Serial.println("*ESP32 Camera Balancing Robot*");
-    Serial.println("--------------------------------------------------------");
-
 
     pinMode(PIN_ENABLE_MOTORS, OUTPUT);
     digitalWrite(PIN_ENABLE_MOTORS, HIGH);
@@ -116,26 +132,13 @@ void setup() {
     delay(50);
     ledcWrite(6, SERVO_AUX_NEUTRO);
 
-    //Wire.begin();
-    Wire.begin(21,22); // SDA, SCL
-
-    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;); // Don't proceed, loop forever
-    }
-
-    display.setRotation(2); // rotate 180°
-    display.clearDisplay();
-    display.setCursor(0,0);
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.print("LEMMING 2");
-    display.display();
 
 
+
+    showText2("STARTE LAGESENSOR");
     initMPU6050();
 
+    showText3("STARTE WLAN");
     // Set NodeMCU Wifi hostname based on chip mac address
     char chip_id[15];
     snprintf(chip_id, 15, "%04X", (uint16_t)(ESP.getEfuseMac()>>32));
@@ -323,7 +326,7 @@ void setup() {
 
 void test1(){
     if((millis()/2000)%2 == 0){
-        setMotorSpeedM1(100*16);
+        setMotorSpeedM1(-400*16);
         //setMotorSpeedM2(-400);
     }else{
         setMotorSpeedM1(400*16);
@@ -346,6 +349,7 @@ void showText1(String str){
     display.print(str);
     display.display();
 }
+
 void showText2(String str){
     uint32_t v = 0;//adc.readVoltage();
     display.fillRect(0, 10, 128, 10, BLACK);
@@ -354,6 +358,7 @@ void showText2(String str){
     display.print(str);
     display.display();
 }
+
 void showText3(String str){
     uint32_t v = 0;//adc.readVoltage();
     display.fillRect(0, 20, 128, 10, BLACK);
@@ -364,6 +369,12 @@ void showText3(String str){
 }
 
 void loop() {
+    if(digitalRead(PIN_TASTER) == LOW){
+        digitalWrite(PIN_SELBSTHALTUNG, LOW);
+        while(1){
+            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
+        }
+    }
     //ArduinoOTA.handle();
 
     test1();
