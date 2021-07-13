@@ -23,7 +23,9 @@
 #define PIN_SERVO 13
 #define PIN_LED 32         
 #define PIN_WIFI_LED 2        
-#define PIN_BUZZER 33         
+#define PIN_BUZZER 33
+#define PIN_SELBSTHALTUNG 15
+#define PIN_TASTER 23
 
 // NORMAL MODE PARAMETERS (MAXIMUN SETTINGS)
 #define MAX_THROTTLE 550

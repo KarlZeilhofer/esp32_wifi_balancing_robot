@@ -24,37 +24,46 @@ portMUX_TYPE muxer1 = portMUX_INITIALIZER_UNLOCKED;
 portMUX_TYPE muxer2 = portMUX_INITIALIZER_UNLOCKED;
 
 void IRAM_ATTR timer1ISR() {
-    static bool stepSet = false;
+    static bool stepSet = false; // ist STEP pin momentan HIGH?
     static uint32_t timer_period = ZERO_SPEED_PERIOD;
+
     portENTER_CRITICAL_ISR(&muxer1);
+
+    int32_t act_speed = act_speed_M1;
+    int32_t target_speed = target_speed_M1;
 
     // change DIR pin only on falling edge of STEP pin, to comply with setup and hold timings
     if(stepSet){
         digitalWrite(PIN_MOTOR1_STEP, LOW);
         stepSet = false;
 
-        if(act_speed_M1 > 0){
+        if(act_speed > 0){
             digitalWrite(PIN_MOTOR1_DIR, HIGH);
         }else{
             digitalWrite(PIN_MOTOR1_DIR, LOW);
         }
     }else{
         // Update timer period
-        if(act_speed_M1 == 0 && target_speed_M1!=0){
+        if(act_speed == 0 && target_speed!=0){
             // TODO: setup DIR pin first!
             timer_period = TIMER_CLOCK/MIN_STEP_CLOCK;
-            if(target_speed_M1 > 0){
-                act_speed_M1 = MIN_STEP_CLOCK;
+            if(target_speed > 0){
+                act_speed = MIN_STEP_CLOCK;
             }else{
-                act_speed_M1 = -MIN_STEP_CLOCK;
+                act_speed = -MIN_STEP_CLOCK;
             }
         // TODO: handle speed direction change!
-        }else if(target_speed_M1 > act_speed_M1){ // accellerating
-            act_speed_M1 = act_speed_M1 + ((MAX_ACCEL+act_speed_M1/2)/act_speed_M1); // constant accelleration, division with rounding
-            timer_period = (TIMER_CLOCK+act_speed_M1/2)/act_speed_M1;
-        }else if(target_speed_M1 < act_speed_M1){ // accellerating
-            act_speed_M1 = act_speed_M1 - ((MAX_ACCEL+act_speed_M1/2)/act_speed_M1); // constant accelleration, division with rounding
-            timer_period = (TIMER_CLOCK+act_speed_M1/2)/act_speed_M1;
+        }else{
+            int32_t abs_act_speed = abs(act_speed);
+            int32_t delta_speed = (MAX_ACCEL + abs_act_speed/2)/abs_act_speed; // constant accelleration, division with rounding
+
+            if(target_speed > act_speed){ // accellerating
+                act_speed = act_speed + delta_speed;
+            }else if(target_speed < act_speed){ // decellerating
+                act_speed = act_speed - delta_speed;
+            }
+            abs_act_speed = abs(act_speed);
+            timer_period = (TIMER_CLOCK+abs_act_speed/2)/abs_act_speed;
         }
 
 
@@ -62,17 +71,17 @@ void IRAM_ATTR timer1ISR() {
         stepSet = true;
     }
 
-
-
-    if (act_dir_M1 != 0) {
+    if (act_speed != 0) {
         // toggle step signal. state is increased in stepper controller each rising edge.
         // pulse width has to be at least 1us.
 
-        if (act_dir_M1 > 0)
+        if (act_speed > 0)
             steps1--;
         else
             steps1++;
     }
+    act_speed_M1 = act_speed;
+
     portEXIT_CRITICAL_ISR(&muxer1);
 
     timerAlarmWrite(timer1, timer_period, true);

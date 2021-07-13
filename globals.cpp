@@ -77,7 +77,6 @@ int16_t motor2_control;
 
 int32_t act_speed_M1, act_speed_M2;        // Actual speed of motors in 16th microsteps per second.
 int32_t target_speed_M1, target_speed_M2;        // Actual speed of motors in 16th microsteps per second.
-int8_t  act_dir_M1, act_dir_M2;            // Actual direction of steppers motors
 int16_t actual_robot_speed;        // overall robot speed (measured from steppers speed)
 int16_t actual_robot_speed_Old;
 float estimated_speed_filtered;    // Estimated robot speed
