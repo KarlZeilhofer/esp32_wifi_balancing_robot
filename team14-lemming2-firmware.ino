@@ -67,6 +67,26 @@ void notFound(AsyncWebServerRequest *request) {
 }
 
 void setup() {
+    pinMode(PIN_SELBSTHALTUNG, OUTPUT);
+    digitalWrite(PIN_SELBSTHALTUNG, HIGH);
+
+    //Wire.begin();
+    Wire.begin(21,22); // SDA, SCL
+
+    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
+        Serial.println(F("SSD1306 allocation failed"));
+        for (;;); // Don't proceed, loop forever
+    }
+
+    display.setRotation(2); // rotate 180°
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.print("LEMMING 2");
+    display.display();
+    delay(1000);
 
     speed_M1 = 0;
     speed_M2 = 0;
@@ -114,26 +134,10 @@ void setup() {
     delay(50);
     ledcWrite(6, SERVO_AUX_NEUTRO);
 
-    //Wire.begin();
-    Wire.begin(21,22); // SDA, SCL
-
-    // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C, false, false)) {
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;); // Don't proceed, loop forever
-    }
-
-    display.setRotation(2); // rotate 180°
-    display.clearDisplay();
-    display.setCursor(0,0);
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.print("LEMMING 2");
-    display.display();
-
-
+    showText2("STARTE LAGESENSOR");
     initMPU6050();
 
+    showText3("STARTE WLAN");
     // Set NodeMCU Wifi hostname based on chip mac address
     char chip_id[15];
     snprintf(chip_id, 15, "%04X", (uint16_t)(ESP.getEfuseMac()>>32));
@@ -324,20 +328,39 @@ void test(){
     delay(1000);
     setMotorSpeedM2(100);
     delay(1000);
-    showVoltage();
 }
 
-void showVoltage(){
-    uint32_t v = 0;//adc.readVoltage();
-    display.setRotation(2); // rotate 180°
-    display.fillRect(0, 10, 128, 10, BLACK);
-    display.setCursor(0,10);
+void showText1(String str){
+    display.fillRect(0, 0, 128, 10, BLACK);
+    display.setCursor(0, 0);
     display.setTextColor(WHITE);
-    display.print(v);
+    display.print(str);
+    display.display();
+}
+void showText2(String str){
+    display.fillRect(0, 10, 128, 10, BLACK);
+    display.setCursor(0, 10);
+    display.setTextColor(WHITE);
+    display.print(str);
+    display.display();
+}
+void showText3(String str){
+    display.fillRect(0, 20, 128, 10, BLACK);
+    display.setCursor(0, 20);
+    display.setTextColor(WHITE);
+    display.print(str);
     display.display();
 }
 
 void loop() {
+    if(digitalRead(PIN_TASTER) == LOW){
+    // TODO: Taster behandeln
+//        digitalWrite(PIN_SELBSTHALTUNG, LOW);
+//        while(1){
+//            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
+//        }
+    }
+
     //ArduinoOTA.handle();
 
     test();
