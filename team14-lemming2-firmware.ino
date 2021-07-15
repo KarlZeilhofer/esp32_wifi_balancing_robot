@@ -84,6 +84,7 @@ void setup() {
     }
 
     display.setRotation(2); // rotate 180°
+    display.clearDisplay();
     showText1("TEAM14 LEMMING 2");
     delay(1000);
 
@@ -325,12 +326,21 @@ void setup() {
 }
 
 void test1(){
-    if((millis()/2000)%2 == 0){
+    if((millis()/2000)%4 == 0){
+        setMotorSpeedM1(400*16);
+        //setMotorSpeedM2(-400);
+    }
+    if((millis()/2000)%4 == 1){
+        setMotorSpeedM1(1);
+        //setMotorSpeedM2(-400);
+    }
+    if((millis()/2000)%4 == 2){
         setMotorSpeedM1(-400*16);
         //setMotorSpeedM2(-400);
-    }else{
-        setMotorSpeedM1(400*16);
-        //setMotorSpeedM2(400);
+    }
+    if((millis()/2000)%4 == 3){
+        setMotorSpeedM1(-1);
+        //setMotorSpeedM2(-400);
     }
     delay(10);
 }
@@ -370,10 +380,11 @@ void showText3(String str){
 
 void loop() {
     if(digitalRead(PIN_TASTER) == LOW){
-        digitalWrite(PIN_SELBSTHALTUNG, LOW);
-        while(1){
-            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
-        }
+        // TODO: AUS-Schaltung wieder aktivieren
+//        digitalWrite(PIN_SELBSTHALTUNG, LOW);
+//        while(1){
+//            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
+//        }
     }
     //ArduinoOTA.handle();
 
