@@ -167,136 +167,136 @@ void setup() {
   }
   */
 
-    /*
-  // if failed to connect with Wifi network set NodeMCU as AP mode
-  IPAddress myIP;
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("*WiFi-STA-Mode*");
-    Serial.print("IP: ");
-    myIP=WiFi.localIP();
-    Serial.println(myIP);
-    digitalWrite(PIN_WIFI_LED, HIGH);    // Wifi LED on when connected to Wifi as STA mode
-    delay(2000);
-  } else {
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(hostname.c_str());
-    myIP = WiFi.softAPIP();
-    Serial.println("");
-    Serial.println("WiFi failed connected to " + sta_ssid);
-    Serial.println("");
-    Serial.println("*WiFi-AP-Mode*");
-    Serial.print("AP IP address: ");
-    Serial.println(myIP);
-    digitalWrite(PIN_WIFI_LED, LOW);   // Wifi LED off when status as AP mode
-    delay(2000);
-  }
+    // if failed to connect with Wifi network set NodeMCU as AP mode
+    IPAddress myIP;
+    if (WiFi.status() == WL_CONNECTED) {
+        Serial.println("");
+        Serial.println("*WiFi-STA-Mode*");
+        Serial.print("IP: ");
+        myIP=WiFi.localIP();
+        Serial.println(myIP);
+        digitalWrite(PIN_WIFI_LED, HIGH);    // Wifi LED on when connected to Wifi as STA mode
+        delay(2000);
+    } else {
+        WiFi.mode(WIFI_AP);
+        WiFi.softAP(hostname.c_str());
+        myIP = WiFi.softAPIP();
+        Serial.println("");
+        Serial.println("WiFi failed connected to " + sta_ssid);
+        Serial.println("");
+        Serial.println("*WiFi-AP-Mode*");
+        Serial.print("AP IP address: ");
+        Serial.println(myIP);
+        digitalWrite(PIN_WIFI_LED, LOW);   // Wifi LED off when status as AP mode
+        delay(2000);
+    }
 
 
-  // Send a GET request to <ESP_IP>/?fader=<inputValue>
+    // Send a GET request to <ESP_IP>/?fader=<inputValue>
     server.on("/", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    String inputValue;
-    String inputMessage;
-    OSCnewMessage = 1;
-    
-    // Get value for Forward/Backward
-    if (request->hasParam(PARAM_FADER1)) {
-      OSCpage = 1;
-      inputValue = request->getParam(PARAM_FADER1)->value();
-      inputMessage = PARAM_FADER1;
-      OSCfader[0] = inputValue.toFloat();
-    }
-    // Get value for Right/Left
-    else if (request->hasParam(PARAM_FADER2)) {
-      OSCpage = 1;
-      inputValue = request->getParam(PARAM_FADER2)->value();
-      inputMessage = PARAM_FADER2;
-      OSCfader[1] = inputValue.toFloat();
-    }
-    // Get value for Servo0
-    else if (request->hasParam(PARAM_PUSH1)) {
-      OSCpage = 1;
-      inputValue = request->getParam(PARAM_PUSH1)->value();
-      inputMessage = PARAM_PUSH1;
-      if(inputValue.equals("1")) OSCpush[0]=1;
-      else OSCpush[0]=0;
-    }
-    // Get value for Setting
-    else if (request->hasParam(PARAM_PUSH2)) {
-      OSCpage = 2;
-      inputValue = request->getParam(PARAM_PUSH2)->value();
-      inputMessage = PARAM_PUSH2;
-      if(inputValue.equals("1")) OSCpush[2]=1;
-      else OSCpush[2]=0;
-    }
-    // Get value for Buzzer
-    else if (request->hasParam(PARAM_PUSH3)) {
-      inputValue = request->getParam(PARAM_PUSH3)->value();
-      inputMessage = PARAM_PUSH3;
-      if(inputValue.equals("1")) {
-        digitalWrite(PIN_BUZZER, HIGH);
-        delay(150);
-        digitalWrite(PIN_BUZZER, LOW);
-        delay(80);
-        digitalWrite(PIN_BUZZER, HIGH);
-        delay(150);
-        digitalWrite(PIN_BUZZER, LOW);
-        delay(80);
-      }
-    }
-    // Get value for Led
-    else if (request->hasParam(PARAM_PUSH4)) {
-      inputValue = request->getParam(PARAM_PUSH4)->value();
-      inputMessage = PARAM_PUSH4;
-      if(inputValue.equals("1")) digitalWrite(PIN_LED, HIGH);
-      else digitalWrite(PIN_LED, LOW);
-    }
-    // Get value for mode PRO
-    else if (request->hasParam(PARAM_TOGGLE1)) {
-      OSCpage = 1;
-      inputValue = request->getParam(PARAM_TOGGLE1)->value();
-      inputMessage = PARAM_TOGGLE1;
-      if(inputValue.equals("1")) OSCtoggle[0]=1;
-      else OSCtoggle[0]=0;
-    }
-    // Get value for P-Stability
-    else if (request->hasParam(PARAM_FADER3)) {
-      OSCpage = 2;
-      inputValue = request->getParam(PARAM_FADER3)->value();
-      inputMessage = PARAM_FADER3;
-      OSCfader[0] = inputValue.toFloat();
-    }
-    // Get value for D-Stability
-    else if (request->hasParam(PARAM_FADER4)) {
-      OSCpage = 2;
-      inputValue = request->getParam(PARAM_FADER4)->value();
-      inputMessage = PARAM_FADER4;
-      OSCfader[0] = inputValue.toFloat();
-    }
-    // Get value for P-Speed
-    else if (request->hasParam(PARAM_FADER5)) {
-      OSCpage = 2;
-      inputValue = request->getParam(PARAM_FADER5)->value();
-      inputMessage = PARAM_FADER5;
-      OSCfader[0] = inputValue.toFloat();
-    }
-    // Get value for I-Speed
-    else if (request->hasParam(PARAM_FADER6)) {
-      OSCpage = 2;
-      inputValue = request->getParam(PARAM_FADER6)->value();
-      inputMessage = PARAM_FADER6;
-      OSCfader[0] = inputValue.toFloat();
-    }
-    else {
-      inputValue = "No message sent";
-    }
-    Serial.println(inputMessage+'='+inputValue);
-    request->send(200, "text/text", "");
-  });
+        String inputValue;
+        String inputMessage;
+        OSCnewMessage = 1;
 
-  server.onNotFound (notFound);    // when a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-  server.begin();                           // actually start the server
-*/
+        // Get value for Forward/Backward
+        if (request->hasParam(PARAM_FADER1)) {
+            OSCpage = 1;
+            inputValue = request->getParam(PARAM_FADER1)->value();
+            inputMessage = PARAM_FADER1;
+            OSCfader[0] = inputValue.toFloat();
+        }
+        // Get value for Right/Left
+        else if (request->hasParam(PARAM_FADER2)) {
+            OSCpage = 1;
+            inputValue = request->getParam(PARAM_FADER2)->value();
+            inputMessage = PARAM_FADER2;
+            OSCfader[1] = inputValue.toFloat();
+        }
+        // Get value for Servo0
+        else if (request->hasParam(PARAM_PUSH1)) {
+            OSCpage = 1;
+            inputValue = request->getParam(PARAM_PUSH1)->value();
+            inputMessage = PARAM_PUSH1;
+            if(inputValue.equals("1")) OSCpush[0]=1;
+            else OSCpush[0]=0;
+        }
+        // Get value for Setting
+        else if (request->hasParam(PARAM_PUSH2)) {
+            OSCpage = 2;
+            inputValue = request->getParam(PARAM_PUSH2)->value();
+            inputMessage = PARAM_PUSH2;
+            if(inputValue.equals("1")) OSCpush[2]=1;
+            else OSCpush[2]=0;
+        }
+        // Get value for Buzzer
+        else if (request->hasParam(PARAM_PUSH3)) {
+            inputValue = request->getParam(PARAM_PUSH3)->value();
+            inputMessage = PARAM_PUSH3;
+            if(inputValue.equals("1")) {
+                digitalWrite(PIN_BUZZER, HIGH);
+                delay(150);
+                digitalWrite(PIN_BUZZER, LOW);
+                delay(80);
+                digitalWrite(PIN_BUZZER, HIGH);
+                delay(150);
+                digitalWrite(PIN_BUZZER, LOW);
+                delay(80);
+            }
+        }
+        // Get value for Led
+        else if (request->hasParam(PARAM_PUSH4)) {
+            inputValue = request->getParam(PARAM_PUSH4)->value();
+            inputMessage = PARAM_PUSH4;
+            if(inputValue.equals("1")) digitalWrite(PIN_LED, HIGH);
+            else digitalWrite(PIN_LED, LOW);
+        }
+        // Get value for mode PRO
+        else if (request->hasParam(PARAM_TOGGLE1)) {
+            OSCpage = 1;
+            inputValue = request->getParam(PARAM_TOGGLE1)->value();
+            inputMessage = PARAM_TOGGLE1;
+            if(inputValue.equals("1")) OSCtoggle[0]=1;
+            else OSCtoggle[0]=0;
+        }
+        // Get value for P-Stability
+        else if (request->hasParam(PARAM_FADER3)) {
+            OSCpage = 2;
+            inputValue = request->getParam(PARAM_FADER3)->value();
+            inputMessage = PARAM_FADER3;
+            OSCfader[0] = inputValue.toFloat();
+        }
+        // Get value for D-Stability
+        else if (request->hasParam(PARAM_FADER4)) {
+            OSCpage = 2;
+            inputValue = request->getParam(PARAM_FADER4)->value();
+            inputMessage = PARAM_FADER4;
+            OSCfader[0] = inputValue.toFloat();
+        }
+        // Get value for P-Speed
+        else if (request->hasParam(PARAM_FADER5)) {
+            OSCpage = 2;
+            inputValue = request->getParam(PARAM_FADER5)->value();
+            inputMessage = PARAM_FADER5;
+            OSCfader[0] = inputValue.toFloat();
+        }
+        // Get value for I-Speed
+        else if (request->hasParam(PARAM_FADER6)) {
+            OSCpage = 2;
+            inputValue = request->getParam(PARAM_FADER6)->value();
+            inputMessage = PARAM_FADER6;
+            OSCfader[0] = inputValue.toFloat();
+        }
+        else {
+            inputValue = "No message sent";
+        }
+        Serial.println(inputMessage+'='+inputValue);
+        request->send(200, "text/text", "");
+    });
+
+    server.onNotFound (notFound);    // when a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+    server.begin();                           // actually start the server
+
+
     initTimers();
 
     // default neutral values
@@ -354,17 +354,17 @@ void showText3(String str){
 
 void loop() {
     if(digitalRead(PIN_TASTER) == LOW){
-    // TODO: Taster behandeln
-//        digitalWrite(PIN_SELBSTHALTUNG, LOW);
-//        while(1){
-//            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
-//        }
+        // TODO: Taster behandeln
+        //        digitalWrite(PIN_SELBSTHALTUNG, LOW);
+        //        while(1){
+        //            delay(10); // Warten auf den Tod, delay setzt den Watchdog zurück
+        //        }
     }
 
     //ArduinoOTA.handle();
 
-    test();
-    return;
+    //    test();
+    //    return;
 
     if (OSCnewMessage) {
         OSCnewMessage = 0;

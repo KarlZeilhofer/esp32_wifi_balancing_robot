@@ -38,8 +38,8 @@
 #define MAX_TARGET_ANGLE_PRO 26   // Max recommended value: 32
 
 // Default control terms for EVO 2
-#define KP 0.32
-#define KD 0.050
+#define KP 0.032
+#define KD 0.0050
 #define KP_THROTTLE 0.080
 #define KI_THROTTLE 0.1
 #define KP_POSITION 0.06
@@ -52,11 +52,11 @@
 #define KP_THROTTLE_RAISEUP 0   // No speed control on raiseup
 #define KI_THROTTLE_RAISEUP 0.0
 
-#define MAX_CONTROL_OUTPUT 500
+#define MAX_CONTROL_OUTPUT 200
 #define ITERM_MAX_ERROR 30   // Iterm windup constants for PI control
 #define ITERM_MAX 10000
 
-#define ANGLE_OFFSET 90.0  // Offset angle for balance (to compensate robot own weight distribution)
+#define ANGLE_OFFSET 100.0  // Offset angle for balance (to compensate robot own weight distribution)
 
 // Servo definitions
 #define SERVO_AUX_NEUTRO 4444  // Servo neutral position
@@ -67,7 +67,7 @@
 #define SERVO2_RANGE 8400
 
 #define ZERO_SPEED 0xffffff
-#define MAX_ACCEL 14      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
+#define MAX_ACCEL 3      // Maximun motor acceleration (MAX RECOMMENDED VALUE: 20) (default:14)
 
 #define MICROSTEPPING 8   // 8 or 16 for 1/8 or 1/16 driver microstepping (default:16)
 
